@@ -9,9 +9,6 @@ from openpyxl.worksheet.datavalidation import DataValidation
 
 # Define the transformation function
 def transform_data_revolut(df):
-    # Filter out the reverted transactions and top-ups
-    df = df[(df['State'] != 'REVERTED') | (df['Type'] != 'TOPUP') | (df['Type'] != 'EXCHANGE')]
-
     df['Amount (abs)'] = df['Amount'].abs()
     df['Source'] = 'Revolut'
     df['6 JARS Category'] = ''
@@ -71,6 +68,8 @@ def transform_file(input_file, output_file, backup_folder, source):
     df = pd.read_csv(input_file)
 
     if source == 'revolut':
+        # Filter out the transactions that are not relevant
+        df = df[(df['State'] != 'REVERTED') & (df['Type'] != 'TOPUP') & (df['Type'] != 'EXCHANGE')]
         transformed_df = transform_data_revolut(df)
     else:
         print("Unsupported source. Please provide a valid source.")
